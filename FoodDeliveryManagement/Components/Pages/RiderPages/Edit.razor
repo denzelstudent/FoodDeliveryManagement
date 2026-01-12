@@ -1,0 +1,124 @@
+﻿@page "/riders/edit"
+@using Microsoft.EntityFrameworkCore
+@using FoodDeliveryManagement.Domain
+@inject IDbContextFactory<FoodDeliveryManagement.Data.FoodDeliveryManagementContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Rider</h2>
+<hr />
+@if (Rider is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Rider" OnValidSubmit="UpdateRider" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Rider.Id" value="@Rider.Id" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Rider.Name" class="form-control" />
+                    <ValidationMessage For="() => Rider.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="vehicletype" class="form-label">VehicleType:</label>
+                    <InputText id="vehicletype" @bind-Value="Rider.VehicleType" class="form-control" />
+                    <ValidationMessage For="() => Rider.VehicleType" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="contacts" class="form-label">Contacts:</label>
+                    <InputText id="contacts" @bind-Value="Rider.Contacts" class="form-control" />
+                    <ValidationMessage For="() => Rider.Contacts" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="availabilitystatus" class="form-label">AvailabilityStatus:</label>
+                    <InputText id="availabilitystatus" @bind-Value="Rider.AvailabilityStatus" class="form-control" />
+                    <ValidationMessage For="() => Rider.AvailabilityStatus" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datecreated" class="form-label">DateCreated:</label>
+                    <InputDate id="datecreated" @bind-Value="Rider.DateCreated" class="form-control" />
+                    <ValidationMessage For="() => Rider.DateCreated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dateupdated" class="form-label">DateUpdated:</label>
+                    <InputDate id="dateupdated" @bind-Value="Rider.DateUpdated" class="form-control" />
+                    <ValidationMessage For="() => Rider.DateUpdated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createdby" class="form-label">CreatedBy:</label>
+                    <InputText id="createdby" @bind-Value="Rider.CreatedBy" class="form-control" />
+                    <ValidationMessage For="() => Rider.CreatedBy" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="updatedby" class="form-label">UpdatedBy:</label>
+                    <InputText id="updatedby" @bind-Value="Rider.UpdatedBy" class="form-control" />
+                    <ValidationMessage For="() => Rider.UpdatedBy" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/riders">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Rider? Rider { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Rider ??= await context.Rider.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Rider is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateRider()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Rider!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!RiderExists(Rider!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/riders");
+    }
+
+    private bool RiderExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Rider.Any(e => e.Id == id);
+    }
+}

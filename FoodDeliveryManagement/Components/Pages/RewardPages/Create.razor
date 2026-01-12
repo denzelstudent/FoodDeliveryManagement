@@ -1,0 +1,97 @@
+﻿@page "/rewards/create"
+@using Microsoft.EntityFrameworkCore
+@using FoodDeliveryManagement.Domain
+@using Microsoft.AspNetCore.Components.Forms
+@inject IDbContextFactory<FoodDeliveryManagement.Data.FoodDeliveryManagementContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Reward</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Reward" OnValidSubmit="AddReward" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="code" class="form-label">Code:</label> 
+                <InputText id="code" @bind-Value="Reward.Code" class="form-control" /> 
+                <ValidationMessage For="() => Reward.Code" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="rewardtype" class="form-label">RewardType:</label> 
+                <InputText id="rewardtype" @bind-Value="Reward.RewardType" class="form-control" /> 
+                <ValidationMessage For="() => Reward.RewardType" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="rewardamount" class="form-label">RewardAmount:</label> 
+                <InputNumber id="rewardamount" @bind-Value="Reward.RewardAmount" class="form-control" /> 
+                <ValidationMessage For="() => Reward.RewardAmount" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="customerid" class="form-label">Customer:</label>
+                <InputSelect id="customerid" class="form-select" @bind-Value="Reward.CustomerId">
+                    <option value="0">-- Select Customer --</option>
+                    @foreach (var c in Customers)
+                    {
+                        <option value="@c.Id">@c.Name</option>
+                    }
+                </InputSelect> 
+                <ValidationMessage For="() => Reward.CustomerId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datecreated" class="form-label">DateCreated:</label> 
+                <InputDate id="datecreated" @bind-Value="Reward.DateCreated" class="form-control" /> 
+                <ValidationMessage For="() => Reward.DateCreated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateupdated" class="form-label">DateUpdated:</label> 
+                <InputDate id="dateupdated" @bind-Value="Reward.DateUpdated" class="form-control" /> 
+                <ValidationMessage For="() => Reward.DateUpdated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createdby" class="form-label">CreatedBy:</label> 
+                <InputText id="createdby" @bind-Value="Reward.CreatedBy" class="form-control" /> 
+                <ValidationMessage For="() => Reward.CreatedBy" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="updatedby" class="form-label">UpdatedBy:</label> 
+                <InputText id="updatedby" @bind-Value="Reward.UpdatedBy" class="form-control" /> 
+                <ValidationMessage For="() => Reward.UpdatedBy" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/rewards">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Reward Reward { get; set; } = new();
+    private List<Customer> Customers { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        Customers = await context.Customer
+            .AsNoTracking()
+            .OrderBy(c => c.Name)
+            .ToListAsync();
+    }
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddReward()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Reward.Add(Reward);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/rewards");
+
+    }
+}
