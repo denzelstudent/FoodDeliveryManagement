@@ -1,0 +1,88 @@
+﻿@page "/vendors/create"
+@using Microsoft.EntityFrameworkCore
+@using FoodDeliveryManagement.Domain
+@inject IDbContextFactory<FoodDeliveryManagement.Data.FoodDeliveryManagementContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Vendor</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Vendor" OnValidSubmit="AddVendor" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Vendor.Name" class="form-control" /> 
+                <ValidationMessage For="() => Vendor.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="address" class="form-label">Address:</label> 
+                <InputText id="address" @bind-Value="Vendor.Address" class="form-control" /> 
+                <ValidationMessage For="() => Vendor.Address" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="contacts" class="form-label">Contacts:</label> 
+                <InputText id="contacts" @bind-Value="Vendor.Contacts" class="form-control" /> 
+                <ValidationMessage For="() => Vendor.Contacts" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="operatinghours" class="form-label">OperatingHours:</label> 
+                <InputText id="operatinghours" @bind-Value="Vendor.OperatingHours" class="form-control" /> 
+                <ValidationMessage For="() => Vendor.OperatingHours" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datecreated" class="form-label">DateCreated:</label> 
+                <InputDate id="datecreated" @bind-Value="Vendor.DateCreated" class="form-control" /> 
+                <ValidationMessage For="() => Vendor.DateCreated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateupdated" class="form-label">DateUpdated:</label> 
+                <InputDate id="dateupdated" @bind-Value="Vendor.DateUpdated" class="form-control" /> 
+                <ValidationMessage For="() => Vendor.DateUpdated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createdby" class="form-label">CreatedBy:</label> 
+                <InputText id="createdby" @bind-Value="Vendor.CreatedBy" class="form-control" /> 
+                <ValidationMessage For="() => Vendor.CreatedBy" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="updatedby" class="form-label">UpdatedBy:</label> 
+                <InputText id="updatedby" @bind-Value="Vendor.UpdatedBy" class="form-control" /> 
+                <ValidationMessage For="() => Vendor.UpdatedBy" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/vendors">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Vendor Vendor { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddVendor()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        Vendor.DateCreated = DateTime.Now;
+        Vendor.DateUpdated = DateTime.Now;
+
+        Vendor.CreatedBy = "System";
+        Vendor.UpdatedBy = "System";
+
+        context.Vendor.Add(Vendor);
+        await context.SaveChangesAsync();
+
+        NavigationManager.NavigateTo("/vendors");
+    }
+
+}

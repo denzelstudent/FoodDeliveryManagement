@@ -1,0 +1,60 @@
+﻿@page "/vendors/details"
+@using Microsoft.EntityFrameworkCore
+@using FoodDeliveryManagement.Domain
+@inject IDbContextFactory<FoodDeliveryManagement.Data.FoodDeliveryManagementContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Vendor</h2>
+    <hr />
+    @if (vendor is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@vendor.Name</dd>
+            <dt class="col-sm-2">Address</dt>
+            <dd class="col-sm-10">@vendor.Address</dd>
+            <dt class="col-sm-2">Contacts</dt>
+            <dd class="col-sm-10">@vendor.Contacts</dd>
+            <dt class="col-sm-2">OperatingHours</dt>
+            <dd class="col-sm-10">@vendor.OperatingHours</dd>
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@vendor.DateCreated</dd>
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@vendor.DateUpdated</dd>
+            <dt class="col-sm-2">CreatedBy</dt>
+            <dd class="col-sm-10">@vendor.CreatedBy</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@vendor.UpdatedBy</dd>
+        </dl>
+        <div>
+            <a href="@($"/vendors/edit?id={vendor.Id}")">Edit</a> |
+            <a href="@($"/vendors")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Vendor? vendor;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        vendor = await context.Vendor.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (vendor is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}
