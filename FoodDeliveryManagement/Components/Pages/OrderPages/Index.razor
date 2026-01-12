@@ -1,0 +1,44 @@
+﻿@page "/orders"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using FoodDeliveryManagement.Domain
+@using FoodDeliveryManagement.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<FoodDeliveryManagement.Data.FoodDeliveryManagementContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="orders/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Order">
+    <PropertyColumn Property="order => order.OrderStatus" />
+    <PropertyColumn Property="order => order.OrderTime" />
+    <PropertyColumn Property="order => order.OrderLocation" />
+    <PropertyColumn Property="order => order.CustomerId" />
+    <PropertyColumn Property="order => order.RiderId" />
+    <PropertyColumn Property="order => order.DateCreated" />
+    <PropertyColumn Property="order => order.DateUpdated" />
+    <PropertyColumn Property="order => order.CreatedBy" />
+    <PropertyColumn Property="order => order.UpdatedBy" />
+
+    <TemplateColumn Context="order">
+        <a href="@($"orders/edit?id={order.Id}")">Edit</a> |
+        <a href="@($"orders/details?id={order.Id}")">Details</a> |
+        <a href="@($"orders/delete?id={order.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private FoodDeliveryManagementContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

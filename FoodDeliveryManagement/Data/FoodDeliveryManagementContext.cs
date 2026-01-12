@@ -19,5 +19,6 @@ namespace FoodDeliveryManagement.Data
         public DbSet<FoodDeliveryManagement.Domain.Customer> Customer { get; set; } = default!;
         public DbSet<FoodDeliveryManagement.Domain.Rider> Rider { get; set; } = default!;
         public DbSet<FoodDeliveryManagement.Domain.Reward> Reward { get; set; } = default!;
+        public DbSet<FoodDeliveryManagement.Domain.Order> Order { get; set; } = default!;
     }
 }
