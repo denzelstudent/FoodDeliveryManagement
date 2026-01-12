@@ -1,0 +1,60 @@
+﻿@page "/items/details"
+@using Microsoft.EntityFrameworkCore
+@using FoodDeliveryManagement.Domain
+@inject IDbContextFactory<FoodDeliveryManagement.Data.FoodDeliveryManagementContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Items</h2>
+    <hr />
+    @if (items is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@items.Name</dd>
+            <dt class="col-sm-2">Price</dt>
+            <dd class="col-sm-10">@items.Price</dd>
+            <dt class="col-sm-2">ItemDescription</dt>
+            <dd class="col-sm-10">@items.ItemDescription</dd>
+            <dt class="col-sm-2">VendorId</dt>
+            <dd class="col-sm-10">@items.VendorId</dd>
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@items.DateCreated</dd>
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@items.DateUpdated</dd>
+            <dt class="col-sm-2">CreatedBy</dt>
+            <dd class="col-sm-10">@items.CreatedBy</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@items.UpdatedBy</dd>
+        </dl>
+        <div>
+            <a href="@($"/items/edit?id={items.Id}")">Edit</a> |
+            <a href="@($"/items")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Items? items;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        items = await context.Items.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (items is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

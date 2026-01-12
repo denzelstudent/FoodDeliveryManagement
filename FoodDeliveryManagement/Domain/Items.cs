@@ -1,6 +1,6 @@
 ﻿namespace FoodDeliveryManagement.Domain
 {
-    public class Item : BaseDomainModel
+    public class Items : BaseDomainModel
     {
         public string Name { get; set; } = string.Empty;
         public decimal Price { get; set; }

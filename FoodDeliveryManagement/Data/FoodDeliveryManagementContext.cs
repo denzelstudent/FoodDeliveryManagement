@@ -15,5 +15,6 @@ namespace FoodDeliveryManagement.Data
         }
 
         public DbSet<FoodDeliveryManagement.Domain.Vendor> Vendor { get; set; } = default!;
+        public DbSet<FoodDeliveryManagement.Domain.Items> Items { get; set; } = default!;
     }
 }
