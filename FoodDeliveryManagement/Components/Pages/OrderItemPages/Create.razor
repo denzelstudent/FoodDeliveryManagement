@@ -80,6 +80,7 @@
 @code {
     [SupplyParameterFromForm]
     private OrderItem OrderItem { get; set; } = new();
+
     private List<Order> Orders { get; set; } = new();
     private List<Items> ItemsList { get; set; } = new();
 
@@ -96,15 +97,28 @@
             .AsNoTracking()
             .OrderBy(i => i.Name)
             .ToListAsync();
+
+        // Set default timestamps and system user
+        OrderItem.DateCreated = DateTime.Now;
+        OrderItem.DateUpdated = DateTime.Now;
+        OrderItem.CreatedBy = "System";
+        OrderItem.UpdatedBy = "System";
     }
 
-
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddOrderItem()
     {
         using var context = DbFactory.CreateDbContext();
+
+        // Ensure timestamps and system user are set
+        OrderItem.DateCreated = DateTime.Now;
+        OrderItem.DateUpdated = DateTime.Now;
+        OrderItem.CreatedBy = "System";
+        OrderItem.UpdatedBy = "System";
+
         context.OrderItem.Add(OrderItem);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/orderitems");
     }
+}
+
 }

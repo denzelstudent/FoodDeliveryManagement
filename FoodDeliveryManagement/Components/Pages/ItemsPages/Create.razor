@@ -74,14 +74,30 @@
 </div>
 
 @code {
-    [SupplyParameterFromForm]
     private Items Items { get; set; } = new();
+    private List<Vendor> Vendors { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    // Pre-fill dates and user when form loads
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        Vendors = await context.Vendor
+            .AsNoTracking()
+            .OrderBy(v => v.Name)
+            .ToListAsync();
+
+        Items.DateCreated = DateTime.Now;
+        Items.DateUpdated = DateTime.Now;
+        Items.CreatedBy = "System";
+        Items.UpdatedBy = "System";
+    }
+
     private async Task AddItems()
     {
         using var context = DbFactory.CreateDbContext();
 
+        // Ensure correct values before saving
         Items.DateCreated = DateTime.Now;
         Items.DateUpdated = DateTime.Now;
         Items.CreatedBy = "System";
@@ -91,12 +107,7 @@
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/items");
     }
-    private List<Vendor> Vendors { get; set; } = new();
+}
 
-    protected override async Task OnInitializedAsync()
-    {
-        using var context = DbFactory.CreateDbContext();
-        Vendors = await context.Vendor.AsNoTracking().ToListAsync();
-    }
 
 }

@@ -68,14 +68,24 @@
     [SupplyParameterFromForm]
     private Vendor Vendor { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    protected override void OnInitialized()
+    {
+        // Pre-fill with current date when form loads
+        Vendor.DateCreated = DateTime.Now;
+        Vendor.DateUpdated = DateTime.Now;
+
+        // Optional: prefill user
+        Vendor.CreatedBy = "System";
+        Vendor.UpdatedBy = "System";
+    }
+
     private async Task AddVendor()
     {
         using var context = DbFactory.CreateDbContext();
 
+        // Ensure current timestamp before saving
         Vendor.DateCreated = DateTime.Now;
         Vendor.DateUpdated = DateTime.Now;
-
         Vendor.CreatedBy = "System";
         Vendor.UpdatedBy = "System";
 
@@ -84,5 +94,7 @@
 
         NavigationManager.NavigateTo("/vendors");
     }
+}
+
 
 }

@@ -69,6 +69,7 @@
 @code {
     [SupplyParameterFromForm]
     private Payment Payment { get; set; } = new();
+
     private List<Order> Orders { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
@@ -79,14 +80,28 @@
             .AsNoTracking()
             .OrderByDescending(o => o.OrderTime)
             .ToListAsync();
+
+        // Set default values
+        Payment.DateCreated = DateTime.Now;
+        Payment.DateUpdated = DateTime.Now;
+        Payment.CreatedBy = "System";
+        Payment.UpdatedBy = "System";
     }
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddPayment()
     {
         using var context = DbFactory.CreateDbContext();
+
+        // Ensure timestamps and system user are set
+        Payment.DateCreated = DateTime.Now;
+        Payment.DateUpdated = DateTime.Now;
+        Payment.CreatedBy = "System";
+        Payment.UpdatedBy = "System";
+
         context.Payment.Add(Payment);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/payments");
     }
+}
+
 }

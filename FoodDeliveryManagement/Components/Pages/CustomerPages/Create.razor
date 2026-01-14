@@ -65,15 +65,31 @@
 </div>
 
 @code {
-    [SupplyParameterFromForm]
     private Customer Customer { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    // Pre-fill dates and user when form loads
+    protected override void OnInitialized()
+    {
+        Customer.DateCreated = DateTime.Now;
+        Customer.DateUpdated = DateTime.Now;
+        Customer.CreatedBy = "System";
+        Customer.UpdatedBy = "System";
+    }
+
     private async Task AddCustomer()
     {
         using var context = DbFactory.CreateDbContext();
+
+        // Ensure correct values before saving
+        Customer.DateCreated = DateTime.Now;
+        Customer.DateUpdated = DateTime.Now;
+        Customer.CreatedBy = "System";
+        Customer.UpdatedBy = "System";
+
         context.Customer.Add(Customer);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/customers");
     }
+}
+
 }

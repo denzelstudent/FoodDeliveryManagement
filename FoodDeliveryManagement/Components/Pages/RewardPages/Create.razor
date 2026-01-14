@@ -72,10 +72,10 @@
 </div>
 
 @code {
-    [SupplyParameterFromForm]
     private Reward Reward { get; set; } = new();
     private List<Customer> Customers { get; set; } = new();
 
+    // Pre-fill dates and user, and load customers
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
@@ -84,14 +84,26 @@
             .AsNoTracking()
             .OrderBy(c => c.Name)
             .ToListAsync();
+
+        Reward.DateCreated = DateTime.Now;
+        Reward.DateUpdated = DateTime.Now;
+        Reward.CreatedBy = "System";
+        Reward.UpdatedBy = "System";
     }
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+
     private async Task AddReward()
     {
         using var context = DbFactory.CreateDbContext();
+
+        Reward.DateCreated = DateTime.Now;
+        Reward.DateUpdated = DateTime.Now;
+        Reward.CreatedBy = "System";
+        Reward.UpdatedBy = "System";
+
         context.Reward.Add(Reward);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/rewards");
-
     }
+}
+
 }

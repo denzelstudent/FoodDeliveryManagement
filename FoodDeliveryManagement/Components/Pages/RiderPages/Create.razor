@@ -65,15 +65,31 @@
 </div>
 
 @code {
-    [SupplyParameterFromForm]
     private Rider Rider { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    // Pre-fill dates and user when form loads
+    protected override void OnInitialized()
+    {
+        Rider.DateCreated = DateTime.Now;
+        Rider.DateUpdated = DateTime.Now;
+        Rider.CreatedBy = "System";
+        Rider.UpdatedBy = "System";
+    }
+
     private async Task AddRider()
     {
         using var context = DbFactory.CreateDbContext();
+
+        // Ensure current values before saving
+        Rider.DateCreated = DateTime.Now;
+        Rider.DateUpdated = DateTime.Now;
+        Rider.CreatedBy = "System";
+        Rider.UpdatedBy = "System";
+
         context.Rider.Add(Rider);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/riders");
     }
+}
+
 }

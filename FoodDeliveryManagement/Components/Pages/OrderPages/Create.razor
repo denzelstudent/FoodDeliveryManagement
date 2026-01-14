@@ -85,6 +85,7 @@
 @code {
     [SupplyParameterFromForm]
     private Order Order { get; set; } = new();
+
     private List<Customer> Customers { get; set; } = new();
     private List<Rider> Riders { get; set; } = new();
 
@@ -101,14 +102,32 @@
             .AsNoTracking()
             .OrderBy(r => r.Name)
             .ToListAsync();
+
+        // Set default values
+        Order.DateCreated = DateTime.Now;
+        Order.DateUpdated = DateTime.Now;
+        Order.OrderTime = DateTime.Now;
+        Order.CreatedBy = "System";
+        Order.UpdatedBy = "System";
     }
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddOrder()
     {
         using var context = DbFactory.CreateDbContext();
+
+        // Ensure timestamps and system user are set
+        Order.DateCreated = DateTime.Now;
+        Order.DateUpdated = DateTime.Now;
+        Order.OrderTime = DateTime.Now;
+        Order.CreatedBy = "System";
+        Order.UpdatedBy = "System";
+
         context.Order.Add(Order);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/orders");
     }
+}
+
+
 }

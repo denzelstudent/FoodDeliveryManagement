@@ -1,7 +1,37 @@
 ﻿@page "/"
+@using FoodDeliveryManagement.Domain
+@inject NavigationManager NavigationManager
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Food Delivery Management</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1 class="text-center mt-4">🍔 Food Delivery Management</h1>
+<p class="text-center mb-4">Welcome! Choose an option below to manage your data.</p>
 
-Welcome to your new app.
+<div class="container">
+    <div class="row text-center">
+        <div class="col-md-3 mb-3">
+            <button class="btn btn-primary w-100" @onclick='() => NavigationManager.NavigateTo("/vendors")'>Vendors</button>
+        </div>
+        <div class="col-md-3 mb-3">
+            <button class="btn btn-success w-100" @onclick='() => NavigationManager.NavigateTo("/items")'>Menu Items</button>
+        </div>
+        <div class="col-md-3 mb-3">
+            <button class="btn btn-info w-100" @onclick='() => NavigationManager.NavigateTo("/customers")'>Customers</button>
+        </div>
+        <div class="col-md-3 mb-3">
+            <button class="btn btn-warning w-100" @onclick='() => NavigationManager.NavigateTo("/riders")'>Riders</button>
+        </div>
+        <div class="col-md-3 mb-3">
+            <button class="btn btn-secondary w-100" @onclick='() => NavigationManager.NavigateTo("/orders")'>Orders</button>
+        </div>
+        <div class="col-md-3 mb-3">
+            <button class="btn btn-dark w-100" @onclick='() => NavigationManager.NavigateTo("/payments")'>Payments</button>
+        </div>
+        <div class="col-md-3 mb-3">
+            <button class="btn btn-light w-100" @onclick='() => NavigationManager.NavigateTo("/orderitems")'>Order Items</button>
+        </div>
+        <div class="col-md-3 mb-3">
+            <button class="btn btn-danger w-100" @onclick='() => NavigationManager.NavigateTo("/rewards")'>Rewards</button>
+        </div>
+    </div>
+</div>
