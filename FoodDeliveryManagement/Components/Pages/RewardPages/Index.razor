@@ -1,43 +1,55 @@
 ﻿@page "/rewards"
 @using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.QuickGrid
 @using FoodDeliveryManagement.Domain
-@using FoodDeliveryManagement.Data
-@implements IAsyncDisposable
 @inject IDbContextFactory<FoodDeliveryManagement.Data.FoodDeliveryManagementContext> DbFactory
+@inject NavigationManager NavigationManager
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Rewards</PageTitle>
 
-<h1>Index</h1>
+<h1>Rewards</h1>
+<a class="btn btn-primary mb-3" href="/rewards/create">Create New</a>
 
-<p>
-    <a href="rewards/create">Create New</a>
-</p>
-
-<QuickGrid Class="table" Items="context.Reward">
-    <PropertyColumn Property="reward => reward.Code" />
-    <PropertyColumn Property="reward => reward.RewardType" />
-    <PropertyColumn Property="reward => reward.RewardAmount" />
-    <PropertyColumn Property="reward => reward.CustomerId" />
-    <PropertyColumn Property="reward => reward.DateCreated" />
-    <PropertyColumn Property="reward => reward.DateUpdated" />
-    <PropertyColumn Property="reward => reward.CreatedBy" />
-    <PropertyColumn Property="reward => reward.UpdatedBy" />
-
-    <TemplateColumn Context="reward">
-        <a href="@($"rewards/edit?id={reward.Id}")">Edit</a> |
-        <a href="@($"rewards/details?id={reward.Id}")">Details</a> |
-        <a href="@($"rewards/delete?id={reward.Id}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Reward Type</th>
+            <th>Reward Amount</th>
+            <th>Customer</th>
+            <th>Date Created</th>
+            <th>Date Updated</th>
+            <th>Created By</th>
+            <th>Updated By</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reward in Rewards)
+        {
+            <tr>
+                <td>@reward.Code</td>
+                <td>@reward.RewardType</td>
+                <td>@reward.RewardAmount</td>
+                <td>@reward.Customer?.Name</td>
+                <td>@reward.DateCreated.ToString("dd/MM/yyyy")</td>
+                <td>@reward.DateUpdated.ToString("dd/MM/yyyy")</td>
+                <td>@reward.CreatedBy</td>
+                <td>@reward.UpdatedBy</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
-    private FoodDeliveryManagementContext context = default!;
+    private List<Reward> Rewards { get; set; } = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        context = DbFactory.CreateDbContext();
+        using var context = DbFactory.CreateDbContext();
+        Rewards = await context.Reward
+            .Include(r => r.Customer)  // Load the related Customer entity
+            .AsNoTracking()
+            .OrderByDescending(r => r.DateCreated)
+            .ToListAsync();
     }
-
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }
+

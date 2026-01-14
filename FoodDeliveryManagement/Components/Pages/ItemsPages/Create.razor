@@ -8,62 +8,45 @@
 <PageTitle>Create</PageTitle>
 
 <h1>Create</h1>
-
-<h2>Items</h2>
+<h2>Menu Item</h2>
 <hr />
+
 <div class="row">
     <div class="col-md-4">
-        <EditForm method="post" Model="Items" OnValidSubmit="AddItems" FormName="create" Enhance>
+        <EditForm Model="Items" OnValidSubmit="AddItems" FormName="create" Enhance>
             <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert"/>
+            <ValidationSummary class="text-danger" role="alert" />
+
             <div class="mb-3">
-                <label for="name" class="form-label">Name:</label> 
-                <InputText id="name" @bind-Value="Items.Name" class="form-control" /> 
-                <ValidationMessage For="() => Items.Name" class="text-danger" /> 
-            </div>        
+                <label for="name" class="form-label">Name:</label>
+                <InputText id="name" @bind-Value="Items.Name" class="form-control" />
+                <ValidationMessage For="() => Items.Name" class="text-danger" />
+            </div>
+
             <div class="mb-3">
-                <label for="price" class="form-label">Price:</label> 
-                <InputNumber id="price" @bind-Value="Items.Price" class="form-control" /> 
-                <ValidationMessage For="() => Items.Price" class="text-danger" /> 
-            </div>        
+                <label for="price" class="form-label">Price:</label>
+                <InputNumber id="price" @bind-Value="Items.Price" class="form-control" />
+                <ValidationMessage For="() => Items.Price" class="text-danger" />
+            </div>
+
             <div class="mb-3">
-                <label for="itemdescription" class="form-label">ItemDescription:</label> 
-                <InputText id="itemdescription" @bind-Value="Items.ItemDescription" class="form-control" /> 
-                <ValidationMessage For="() => Items.ItemDescription" class="text-danger" /> 
-            </div>        
+                <label for="itemdescription" class="form-label">Item Description:</label>
+                <InputText id="itemdescription" @bind-Value="Items.ItemDescription" class="form-control" />
+                <ValidationMessage For="() => Items.ItemDescription" class="text-danger" />
+            </div>
+
             <div class="mb-3">
                 <label for="vendorid" class="form-label">Vendor:</label>
-
                 <InputSelect id="vendorid" class="form-select" @bind-Value="Items.VendorId">
-                    <option value="0">-- Select Vendor --</option>
+                    <option value="">-- Select Vendor --</option>
                     @foreach (var v in Vendors)
                     {
                         <option value="@v.Id">@v.Name</option>
                     }
                 </InputSelect>
-
                 <ValidationMessage For="() => Items.VendorId" class="text-danger" />
             </div>
-            <div class="mb-3">
-                <label for="datecreated" class="form-label">DateCreated:</label> 
-                <InputDate id="datecreated" @bind-Value="Items.DateCreated" class="form-control" /> 
-                <ValidationMessage For="() => Items.DateCreated" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="dateupdated" class="form-label">DateUpdated:</label> 
-                <InputDate id="dateupdated" @bind-Value="Items.DateUpdated" class="form-control" /> 
-                <ValidationMessage For="() => Items.DateUpdated" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="createdby" class="form-label">CreatedBy:</label> 
-                <InputText id="createdby" @bind-Value="Items.CreatedBy" class="form-control" /> 
-                <ValidationMessage For="() => Items.CreatedBy" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="updatedby" class="form-label">UpdatedBy:</label> 
-                <InputText id="updatedby" @bind-Value="Items.UpdatedBy" class="form-control" /> 
-                <ValidationMessage For="() => Items.UpdatedBy" class="text-danger" /> 
-            </div>        
+
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -74,19 +57,18 @@
 </div>
 
 @code {
+    [SupplyParameterFromForm]
     private Items Items { get; set; } = new();
     private List<Vendor> Vendors { get; set; } = new();
 
-    // Pre-fill dates and user when form loads
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-
-        Vendors = await context.Vendor
-            .AsNoTracking()
+        Vendors = await context.Vendor.AsNoTracking()
             .OrderBy(v => v.Name)
             .ToListAsync();
 
+        // Default timestamps and system user
         Items.DateCreated = DateTime.Now;
         Items.DateUpdated = DateTime.Now;
         Items.CreatedBy = "System";
@@ -95,9 +77,13 @@
 
     private async Task AddItems()
     {
-        using var context = DbFactory.CreateDbContext();
+        if (Items.VendorId == 0 || Items.VendorId == null)
+        {
+            // Show validation or prevent submission
+            return;
+        }
 
-        // Ensure correct values before saving
+        using var context = DbFactory.CreateDbContext();
         Items.DateCreated = DateTime.Now;
         Items.DateUpdated = DateTime.Now;
         Items.CreatedBy = "System";
@@ -105,9 +91,11 @@
 
         context.Items.Add(Items);
         await context.SaveChangesAsync();
+
         NavigationManager.NavigateTo("/items");
     }
 }
+
 
 
 }
